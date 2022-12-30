@@ -1,0 +1,26 @@
+[project]
+name = ""
+version = ""
+description = ""
+authors = [
+    {name = "devtud", email = "devtud@gmail.com"},
+]
+dependencies = [
+    "flet>=0.2.4",
+    "httpx>=0.23.1",
+    "aiocronjob @ file:///${PROJECT_ROOT}/aiocronjob_ui/aiocronjob",
+]
+requires-python = ">=3.11"
+license = {text = "MIT"}
+[project.optional-dependencies]
+lint = [
+    "black[d]>=22.12.0",
+]
+
+[build-system]
+requires = ["pdm-pep517>=1.0.0"]
+build-backend = "pdm.pep517.api"
+
+[tool]
+[tool.pdm]
+[tool.pdm.dev-dependencies]

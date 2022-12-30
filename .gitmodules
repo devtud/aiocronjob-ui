@@ -1,0 +1,3 @@
+[submodule "aiocronjob_ui/aiocronjob"]
+	path = aiocronjob_ui/aiocronjob
+	url = https://github.com/devtud/aiocronjob
