@@ -13,6 +13,32 @@ class Subscriber(Protocol):
 API_URL = "http://localhost:8000/api"
 
 
+class LogsService:
+    __subscribers = set()
+
+    @classmethod
+    def subscribe(cls, subscriber: Subscriber):
+        cls.__subscribers.add(subscriber)
+
+    @classmethod
+    def unsubscribe(cls, subscriber: Subscriber):
+        cls.__subscribers.remove(subscriber)
+
+    @classmethod
+    def _notify_all(cls, log):
+        for subscriber in cls.__subscribers:
+            subscriber(log)
+
+    @classmethod
+    def fetch_logs(cls):
+        with httpx.stream("GET", f"{API_URL}/log-stream") as r:
+            for line in r.iter_lines():
+                if cls.__subscribers:
+                    cls._notify_all(line)
+                else:
+                    break
+
+
 class JobsService:
     _lock = threading.Lock()
 
@@ -48,7 +74,7 @@ class JobsService:
         if not self._is_loading:
             self._fetch_jobs()
 
-    def do_job_action(self, job_name: str, action: Literal['cancel', 'start']):
+    def do_job_action(self, job_name: str, action: Literal["cancel", "start"]):
         with httpx.Client() as client:
             try:
                 response = client.get(f"{API_URL}/jobs/{job_name}/{action}")
@@ -57,6 +83,10 @@ class JobsService:
                 self._exc = e
                 return
         self._fetch_jobs()
+
+    def consume_logs(self, consumer):
+        LogsService.subscribe(consumer)
+        threading.Thread(target=LogsService.fetch_logs).start()
 
     def _fetch_jobs(self) -> None:
         self._lock.acquire()

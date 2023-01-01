@@ -37,7 +37,9 @@ class JobsControl(FlutterLikeUserControl):
                 BottomSheetService.close()
                 self._jobs_service.do_job_action(job_["definition"]["name"], "cancel")
 
-            action_button = ft.ElevatedButton("Stop job", on_click=on_click, data=job)
+            action_button = ft.TextButton(
+                "Stop job", on_click=on_click, icon=ft.icons.STOP, data=job
+            )
         else:
 
             def on_click(event: ft.ControlEvent):
@@ -45,7 +47,9 @@ class JobsControl(FlutterLikeUserControl):
                 BottomSheetService.close()
                 self._jobs_service.do_job_action(job_["definition"]["name"], "start")
 
-            action_button = ft.ElevatedButton("Start job", on_click=on_click, data=job)
+            action_button = ft.TextButton(
+                "Start job", on_click=on_click, icon=ft.icons.PLAY_ARROW, data=job
+            )
 
         BottomSheetService.set_content(
             ft.Container(
@@ -53,7 +57,7 @@ class JobsControl(FlutterLikeUserControl):
                     [
                         ft.Text(job["definition"]["name"]),
                         action_button,
-                        ft.Divider(height=9, thickness=3),
+                        ft.Divider(height=3, thickness=3),
                         ft.TextButton(
                             "Cancel",
                             on_click=lambda e: BottomSheetService.close(),
