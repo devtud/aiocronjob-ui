@@ -8,7 +8,6 @@ authors = [
 dependencies = [
     "flet>=0.2.4",
     "httpx>=0.23.1",
-    "aiocronjob @ file:///${PROJECT_ROOT}/aiocronjob_ui/aiocronjob",
 ]
 requires-python = ">=3.11"
 license = {text = "MIT"}
