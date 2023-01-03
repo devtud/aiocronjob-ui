@@ -10,7 +10,7 @@ class LogsContainerService:
     @classmethod
     def append_log(cls, log_entry: str):
         fmt_log, color = LogsContainerService.format_log_entry(log_entry)
-        cls.__container.controls.append(ft.Text(fmt_log, color=color))
+        cls.__container.controls.append(ft.Text(fmt_log, color=color, selectable=True))
         cls.__container.update()
 
     @staticmethod
