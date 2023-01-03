@@ -1,9 +1,10 @@
 from typing import Literal, Optional
 
 import flet as ft
-from aiocronjob_ui.bottom_sheet_service import BottomSheetService
-from aiocronjob_ui.jobs_service import JobsService
+
 from .generic_control import FlutterLikeUserControl
+from ..bottom_sheet_service import BottomSheetService
+from ..jobs_service import JobsService
 
 
 class JobsControl(FlutterLikeUserControl):

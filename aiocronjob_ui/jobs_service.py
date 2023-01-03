@@ -3,14 +3,12 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import Optional, Protocol, Literal
 
 import httpx
+from .config import Settings
 
 
 class Subscriber(Protocol):
     def __call__(self, jobs: list[dict] = None, exc: Exception = None) -> None:
         ...
-
-
-API_URL = "http://localhost:8000/api"
 
 
 class LogsService:
@@ -31,7 +29,7 @@ class LogsService:
 
     @classmethod
     def fetch_logs(cls):
-        with httpx.stream("GET", f"{API_URL}/log-stream") as r:
+        with httpx.stream("GET", f"{Settings.api_url}/log-stream") as r:
             for line in r.iter_lines():
                 if cls.__subscribers:
                     cls._notify_all(line)
@@ -77,14 +75,15 @@ class JobsService:
     def do_job_action(self, job_name: str, action: Literal["cancel", "start"]):
         with httpx.Client() as client:
             try:
-                response = client.get(f"{API_URL}/jobs/{job_name}/{action}")
+                response = client.get(f"{Settings.api_url}/jobs/{job_name}/{action}")
                 response.raise_for_status()
             except Exception as e:
                 self._exc = e
                 return
         self._fetch_jobs()
 
-    def consume_logs(self, consumer):
+    @staticmethod
+    def consume_logs(consumer):
         LogsService.subscribe(consumer)
         threading.Thread(target=LogsService.fetch_logs).start()
 
@@ -96,7 +95,7 @@ class JobsService:
         try:
             with httpx.Client() as client:
                 try:
-                    response = client.get(f"{API_URL}/jobs")
+                    response = client.get(f"{Settings.api_url}/jobs")
                     response.raise_for_status()
                     self._jobs = response.json()
                 except Exception as e:
