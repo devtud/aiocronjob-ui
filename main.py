@@ -1,9 +1,9 @@
 import flet as ft
 
-from .aiocronjob_ui.bottom_sheet_service import BottomSheetService
-from .aiocronjob_ui.controls.jobs_control import JobsControl
-from .aiocronjob_ui.jobs_service import jobs_service
-from .aiocronjob_ui.logs_container_service import LogsContainerService
+from aiocronjob_ui.bottom_sheet_service import BottomSheetService
+from aiocronjob_ui.controls.jobs_control import JobsControl
+from aiocronjob_ui.jobs_service import jobs_service
+from aiocronjob_ui.logs_container_service import LogsContainerService
 
 
 def main(page: ft.Page):
