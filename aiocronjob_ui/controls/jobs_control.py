@@ -90,5 +90,6 @@ class JobsControl(FlutterLikeUserControl):
                     if self._filter == "all" or self._filter == job["status"]
                 ],
                 expand=True,
+                scroll=ft.ScrollMode.ADAPTIVE,
             )
         return content
