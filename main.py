@@ -7,6 +7,7 @@ from aiocronjob_ui.logs_container_service import LogsContainerService
 
 
 def main(page: ft.Page):
+    page.theme_mode = ft.ThemeMode.LIGHT
     page.overlay.append(BottomSheetService.get_bs())
     page.floating_action_button = ft.FloatingActionButton(
         icon=ft.icons.REFRESH,

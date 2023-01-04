@@ -1,3 +1,4 @@
+import logging
 import threading
 from concurrent.futures import ThreadPoolExecutor
 from typing import Optional, Protocol, Literal
@@ -26,15 +27,18 @@ class LogsService:
     def _notify_all(cls, log):
         for subscriber in cls.__subscribers:
             subscriber(log)
+        logging.debug("Notified %d subscribers", len(cls.__subscribers))
 
     @classmethod
     def fetch_logs(cls):
         with httpx.stream("GET", f"{Settings.api_url}/log-stream") as r:
+            logging.debug("A log stream was started.")
             for line in r.iter_lines():
                 if cls.__subscribers:
                     cls._notify_all(line)
                 else:
                     break
+        logging.debug("The log stream has ended.")
 
 
 class JobsService:
@@ -70,16 +74,20 @@ class JobsService:
     def refresh(self):
         # drop a new operation if there is one in progress
         if not self._is_loading:
+            logging.debug("Refreshing jobs...")
             self._fetch_jobs()
+        else:
+            logging.debug("Cannot refresh jobs as the service is already loading.")
 
     def do_job_action(self, job_name: str, action: Literal["cancel", "start"]):
-        with httpx.Client() as client:
-            try:
+        try:
+            with httpx.Client(timeout=10) as client:
                 response = client.get(f"{Settings.api_url}/jobs/{job_name}/{action}")
                 response.raise_for_status()
-            except Exception as e:
-                self._exc = e
-                return
+        except Exception as e:
+            logging.error("Exception in do_job_action: %s", e)
+            self._exc = e
+            return
         self._fetch_jobs()
 
     @staticmethod
@@ -93,14 +101,14 @@ class JobsService:
         self._is_loading = True
 
         try:
-            with httpx.Client() as client:
-                try:
-                    response = client.get(f"{Settings.api_url}/jobs")
-                    response.raise_for_status()
-                    self._jobs = response.json()
-                except Exception as e:
-                    self._exc = e
-                    return
+            with httpx.Client(timeout=2) as client:
+                response = client.get(f"{Settings.api_url}/jobs")
+                response.raise_for_status()
+                self._jobs = response.json()
+        except Exception as e:
+            logging.error("Exception in _fetch_jobs: %s", e)
+            self._exc = e
+            return
         finally:
             self._is_loading = False
             self._lock.release()
