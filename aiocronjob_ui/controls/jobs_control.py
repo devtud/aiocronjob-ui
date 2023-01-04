@@ -1,7 +1,7 @@
 from typing import Literal, Optional
 
 import flet as ft
-
+from ..config import logger
 from .generic_control import FlutterLikeUserControl
 from ..bottom_sheet_service import BottomSheetService
 from ..jobs_service import JobsService
@@ -21,6 +21,11 @@ class JobsControl(FlutterLikeUserControl):
     def _on_jobs_fetched(self, jobs=None, exc=None):
         self._jobs = jobs
         self._exc = exc
+        logger.debug(
+            "Jobs controller was notified with jobs=%s and exc=%s",
+            bool(jobs),
+            bool(exc),
+        )
         self.update()
 
     def did_mount(self):
